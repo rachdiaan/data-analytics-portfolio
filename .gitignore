@@ -1,0 +1,53 @@
+# Data never belongs in this repository. The tools here ship synthetic fixtures and
+# generate their own demo data; anything else that lands in the tree is an accident,
+# so the default is to refuse it rather than to review it file by file.
+*.parquet
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.xlsb
+*.twb
+*.twbx
+*.tdsx
+*.hyper
+*.pptx
+*.docx
+*.pdf
+*.zip
+*.gz
+*.7z
+*.db
+*.duckdb
+*.sqlite*
+
+# ...with one exception: the hand-written fixture the tests need.
+!tools/twb-tools/fixtures/sample.twb
+
+# Credentials and anything that smells like one. There are none in this repository
+# and there never will be, but a pattern costs nothing and a mistake costs a key.
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*
+*secret*
+*token*
+.aws/
+.tableau/
+service-account*.json
+
+# Local noise
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+demo/

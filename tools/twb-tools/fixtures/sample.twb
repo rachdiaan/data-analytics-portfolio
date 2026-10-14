@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- Synthetic workbook. Hand-written for the tests: it carries each of the four
+     failures twb_tools.py exists for, and nothing else. No real data source. -->
+<workbook source-platform='win' version='2021.4' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <datasources>
+
+    <!-- Form 1: the query sits in the element's text. -->
+    <datasource caption='Sales (element form)' name='federated.sales1'>
+      <connection class='federated'>
+        <relation connection='postgres.1' name='Custom SQL Query' type='text'>SELECT region_id, SUM(amount) AS total_amount, COUNT(*) AS n_orders
+FROM public.orders
+GROUP BY region_id</relation>
+      </connection>
+    </datasource>
+
+    <!-- Form 2: the same kind of query, stored as an escaped attribute on a
+         self-closing element. A reader that only looks at element text reports
+         "no Custom SQL" for this datasource. -->
+    <datasource caption='Targets (attribute form)' name='federated.targets1'>
+      <connection class='federated'>
+        <relation connection='postgres.1' name='Custom SQL Query' type='text' text='SELECT region_id, target AS target_amount FROM public.targets WHERE active = 1' />
+      </connection>
+    </datasource>
+
+    <!-- A plain table relation: must not be picked up as Custom SQL. -->
+    <datasource caption='Regions' name='federated.regions1'>
+      <connection class='federated'>
+        <relation name='regions' table='[public].[regions]' type='table' />
+      </connection>
+    </datasource>
+
+  </datasources>
+
+  <worksheets>
+
+    <!-- Correct child order: view, style, panes. -->
+    <worksheet name='Revenue by region'>
+      <view>
+        <datasources>
+          <datasource caption='Sales (element form)' name='federated.sales1' />
+        </datasources>
+      </view>
+      <style />
+      <panes>
+        <pane>
+          <mark class='Bar' />
+          <encodings>
+            <text column='[federated.sales1].[sum:total_amount:qk]' />
+          </encodings>
+        </pane>
+      </panes>
+    </worksheet>
+
+    <!-- Wrong order: style before view. Tableau refuses to open this and names a
+         GUID rather than the element. -->
+    <worksheet name='Broken order'>
+      <style />
+      <view>
+        <datasources>
+          <datasource caption='Regions' name='federated.regions1' />
+        </datasources>
+      </view>
+      <panes>
+        <pane>
+          <mark class='Automatic' />
+        </pane>
+      </panes>
+    </worksheet>
+
+  </worksheets>
+
+  <!-- A simple-id is present, but the format-change manifest below does not declare
+       WindowsPersistSimpleIdentifiers. The workbook opens, then fails on save. -->
+  <windows>
+    <window class='worksheet' name='Revenue by region'>
+      <simple-id uuid='{00000000-0000-0000-0000-000000000001}' />
+    </window>
+  </windows>
+
+  <document-format-change-manifest>
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+  </document-format-change-manifest>
+
+</workbook>
